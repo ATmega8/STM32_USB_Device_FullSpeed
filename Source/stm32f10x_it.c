@@ -125,24 +125,11 @@ void DebugMon_Handler(void)
 /*  file (startup_stm32f10x_xx.s).                                            */
 /******************************************************************************/
 volatile uint16_t usbInterruptStatus;
-volatile uint16_t isrList[100];
-volatile uint16_t isrCount = 0;
 
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
 
 	usbInterruptStatus = _GetISTR();
-
-	if(isrCount < 100)
-	{
-		isrList[isrCount] = usbInterruptStatus;
-	}
-	else
-	{
-		isrList[99] = usbInterruptStatus;
-	}
-
-	isrCount++;
 
 	if (usbInterruptStatus & ISTR_SOF & IMR_MSK)
 	{
