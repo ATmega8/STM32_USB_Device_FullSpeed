@@ -1,7 +1,5 @@
 #include "usb_init.h"
 
-static uint32_t usbResumeCount = 0;
-
 void USB_InterfaceInit(void)
 {
 	uint16_t wRegVal;
@@ -83,43 +81,5 @@ void USB_Reset(void)
 	_SetEPAddress(3, 3);
 
 	_SetDADDR(DADDR_EF | 0); 
-}
-
-void USB_Resume(void)
-{
-	uint16_t wCNTR;
-
-	usbResumeCount++;
-
-	if(usbResumeCount == 2)
-	{
-		wCNTR = _GetCNTR();
-	    wCNTR |= CNTR_RESUME;
-		_SetCNTR(wCNTR);
-
-		usbResumeCount = 0;
-
-		while(usbResumeCount++)
-		{
-			if(usbResumeCount == 10)
-			{
-				wCNTR = _GetCNTR();
-				wCNTR &= (~CNTR_RESUME);
-				_SetCNTR(wCNTR);
-			}
-		}
-	}
-
-	usbResumeCount = 0;
-}
-
-void USB_CTR(void)
-{
-
-}
-
-void USB_Enable(void)
-{
-
 }
 
