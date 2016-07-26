@@ -91,3 +91,22 @@ USB_GetCurrentTransaction(USB_CurrentTransTypeDef* trans)
 	return USB_Success;
 }
 
+/*
+ *0       1   2   3   4   5    6   7   8   9    10  11  12  13   14  15  16
+ *+-------+---+---+---+---+----+---+---+---+----+---+---+---+----+---+---+
+ *|ReqType|Req|  NULL | wValue |  NULL | wIndex |  NULL |wLength |  NULL |
+ *+-------+---+---+---+---+----+---+---+---+----+---+---+---+----+---+---+
+ */
+void USB_GetCurrentInfo(USB_InformationTypeDef* info)
+{
+	uint8_t* pdata;
+
+	pdata = PMAAddr + (uint8_t*)(_GetEPRxAddr(ENDP0) * 2);
+
+	info->USBbmRequestType = *pdata;
+	info->USBbRequest      = *(pdata + 1);
+	info->USBwValue        = (((uint16_t)*(pdata + 5) << 8)   | *(pdata + 4));
+	info->USBwIndex        = (((uint16_t)*(pdata + 9) << 8)   | *(pdata + 8));
+	info->USBwLength       = (((uint16_t)*(pdata + 13) << 8)  | *(pdata + 12));
+}
+

@@ -7,9 +7,14 @@ typedef enum
 	USB_Error
 } USB_StatusTypeDef;
 
-/*USB设备类型*/
 typedef struct
 {
+	uint8_t  USBbmRequestType;   /* bmRequestType */
+	uint8_t  USBbRequest;        /* bRequest */
+	uint16_t USBwValue;          /* wValue */
+	uint16_t USBwIndex;          /* wIndex */
+	uint16_t USBwLength;         /* wLength */
+} USB_InformationTypeDef;
 
 } USB_DeviceTypeDef;
 
