@@ -63,6 +63,7 @@ set ( CMAKE_ASM_COMPILER "/usr/bin/arm-none-eabi-gcc" )
 #CFLAGS
 set ( CMAKE_C_FLAGS "-g3 -O0 -Wall -nostartfiles -mthumb -mcpu=cortex-m3")
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,--gc-sections -u _printf_nano" )
+set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections" )
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfloat-abi=soft -mabi=aapcs --specs=rdimon.specs" )
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,--start-group -lgcc -lc -lm -lrdimon -Wl,--end-group" )
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D USE_STDPERIPH_DRIVER -D STM32F10X_MD" )

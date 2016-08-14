@@ -1,4 +1,5 @@
 #include "usb_regs.h"
+#include "usb_core.h"
 
 uint32_t wInterrupt_Mask;
 
