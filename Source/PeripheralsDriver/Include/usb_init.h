@@ -1,10 +1,14 @@
 #include "usb_regs.h"
+#include "usb_core.h"
 
 uint32_t wInterrupt_Mask;
 
-#define USB_ENABLE_GPIO_CLOCK     RCC_APB2Periph_GPIOA 
-#define USB_ENABLE_GPIO_PORT      GPIOA
-#define USB_ENABLE_GPIO_PIN       GPIO_Pin_3
+USB_DeviceTypeDef                    usbDevice;
+USB_InformationTypeDef               usbDeviceInfo;
+
+#define USB_ENABLE_GPIO_CLOCK        RCC_APB2Periph_GPIOA 
+#define USB_ENABLE_GPIO_PORT         GPIOA
+#define USB_ENABLE_GPIO_PIN          GPIO_Pin_3
 
 #define BTABLE_ADDRESS               0x00
 #define ENDP0_RXADDR                 0x40

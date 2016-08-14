@@ -140,10 +140,7 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 	}
 	if (usbInterruptStatus & ISTR_CTR & IMR_MSK)
 	{
-		LED_SetLED();
-
-		USB_GetCurrentTransaction(&cTrans);
-
+		USB_CTR();
 	}
 	if (usbInterruptStatus & ISTR_RESET & IMR_MSK)
 	{

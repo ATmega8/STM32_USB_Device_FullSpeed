@@ -4,6 +4,8 @@ void USB_InterfaceInit(void)
 {
 	uint16_t wRegVal;
 
+	usbDevice.pInformation = &usbDeviceInfo;
+
 	NVIC_InitTypeDef NVIC_InitStructure;
 
 	/* USB 时钟初始化 */
