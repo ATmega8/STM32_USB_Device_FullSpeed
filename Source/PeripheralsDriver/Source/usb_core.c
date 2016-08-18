@@ -384,5 +384,16 @@ void USB_CTR(USB_CurrentTransTypeDef* tran)
 				}
 			}
 		}
-	}
+}
+
+uint32_t USB_CDC_SendData(const uint8_t* pdata, uint32_t len)
+{
+	if(len >= 64)
+		return 0;
+
+	UserToPMABufferCopy(pdata, GetEPTxAddr(ENDP1), len);
+    SetEPTxCount(ENDP1, len);
+    SetEPTxValid(ENDP1);
+
+	return len;
 }
