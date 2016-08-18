@@ -252,6 +252,7 @@ void USB_CDC_SetLineCode(USB_CurrentTransTypeDef* tran)
 	SetEPRxCount(ENDP0, 64);
 
 	usbDevice.controlState = USB_ControlState_LastDataOut;
+	usbDevice.state = CONFIGURED;
 }
 
 void USB_DataSetup0(USB_CurrentTransTypeDef* tran)
@@ -276,17 +277,12 @@ void USB_DataSetup0(USB_CurrentTransTypeDef* tran)
 	}
 }
 
-void USB_CTR(void)
+void USB_CTR(USB_CurrentTransTypeDef* tran)
 {
-	USB_CurrentTransTypeDef tran;
 
-	while((_GetISTR() & ISTR_CTR) != 0)
-	{
-		USB_GetCurrentTransaction(&tran);
-
-		if(tran.ep == 0) /*控制端点*/
+		if(tran->ep == 0) /*控制端点*/
 		{
-			switch(tran.transaction)
+			switch(tran->transaction)
 			{
 				case USB_Transaction_SETUP:
 
@@ -297,29 +293,29 @@ void USB_CTR(void)
 					/*控制传输非数据阶段*/
 					if(usbDevice.pInformation->USBwLength == 0)
 					{
-						USB_NoDataSetup0(&tran);
+						USB_NoDataSetup0(tran);
 					}
 					else /*控制传输数据阶段*/
 					{
-						USB_DataSetup0(&tran);
+						USB_DataSetup0(tran);
 					}
 
-					_SetEPRxTxStatus(ENDP0, tran.rxState, tran.txState);
+					_SetEPRxTxStatus(ENDP0, tran->rxState, tran->txState);
 
 					break;
 
 				case USB_Transaction_OUT:
 					if(usbDevice.controlState == USB_ControlState_LastDataOut)
 					{
-						tran.rxState = EP_RX_STALL;
-						tran.txState = EP_TX_VALID;
+						tran->rxState = EP_RX_STALL;
+						tran->txState = EP_TX_VALID;
 
 						SetEPTxCount(ENDP0, 0);
 
 						usbDevice.controlState = USB_ControlState_StatusIn;
 					}
 
-					_SetEPRxTxStatus(ENDP0, tran.rxState, tran.txState);
+					_SetEPRxTxStatus(ENDP0, tran->rxState, tran->txState);
 
 					break;
 
@@ -376,7 +372,17 @@ void USB_CTR(void)
 		}
 		else /*非控制端点*/
 		{
+			if(tran->ep ==1)
+			{
+				if(tran->transaction == USB_Transaction_IN)
+				{
+					/*UserToPMABufferCopy(&Virtual_Com_Port_StringProduct[0],
+							GetEPTxAddr(ENDP1), VIRTUAL_COM_PORT_SIZ_STRING_PRODUCT);
 
+					SetEPTxCount(ENDP1, 1);*/
+				    SetEPTxValid(ENDP1);
+				}
+			}
 		}
 	}
 }
