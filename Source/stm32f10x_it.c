@@ -29,6 +29,11 @@
 #include "usb_core.h"
 #include "led.h"
 
+#include "FreeRTOS.h"
+#include "semphr.h"
+
+#include "usb_task.h"
+
 /** @addtogroup STM32F10x_StdPeriph_Examples
   * @{
   */
@@ -126,12 +131,13 @@ void DebugMon_Handler(void)
 /*  file (startup_stm32f10x_xx.s).                                            */
 /******************************************************************************/
 volatile uint16_t usbInterruptStatus;
+static BaseType_t xHigherPriorityTaskWoken;
 
 USB_CurrentTransTypeDef cTrans;
 
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
-
+	xHigherPriorityTaskWoken = pdFALSE;
 	usbInterruptStatus = _GetISTR();
 
 	if (usbInterruptStatus & ISTR_SOF & IMR_MSK)
@@ -140,14 +146,16 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 	}
 	if (usbInterruptStatus & ISTR_CTR & IMR_MSK)
 	{
-		USB_CTR();
+		USB_GetCurrentTransaction(&tran);
+		xSemaphoreGiveFromISR(USB_CTR_Semaphore, &xHigherPriorityTaskWoken);
 	}
 	if (usbInterruptStatus & ISTR_RESET & IMR_MSK)
 	{
-		/*8800*/
 		_SetISTR((uint16_t)CLR_RESET);
 		USB_Reset();
 	}
+
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
  
 

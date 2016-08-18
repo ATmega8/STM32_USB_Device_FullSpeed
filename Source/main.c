@@ -1,27 +1,19 @@
 #include "main.h"
 
 #include "led.h"
+#include "usb_task.h"
 #include "usb_init.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
 
-void Task1(void* parameters)
-{
-	while(1)
-	{
-		vTaskDelay(50);
-	}
-}
+const char str[12] = "He said Hi!\n";
 
-void Task2(void* parameters)
+void IDLE_Task(void* parameters)
 {
 	while(1)
 	{
-		LED_SetLED();
-		vTaskDelay(50);
-		LED_ResetLED();
-		vTaskDelay(50);
+
 	}
 }
 
@@ -33,6 +25,9 @@ int main(void)
 	LED_Init();
 	USB_InterfaceInit();
 
+	xTaskCreate(USB_Task, "USB Task", 1024, NULL, 3, NULL);
+	xTaskCreate(IDLE_Task, "Idle Task", 1024, NULL, 1, NULL);
+	vTaskStartScheduler();
 
 	while(1)
 	{

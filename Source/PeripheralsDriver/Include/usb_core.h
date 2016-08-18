@@ -60,7 +60,8 @@ typedef enum
 {
 	DEFAULT,
 	ADDRESS,
-	CONFIGURE
+	CONFIGURE,
+	CONFIGURED
 } USB_DeviceStateTypeDef;
 
 /*USB设备类型*/
@@ -93,5 +94,8 @@ typedef struct
 
 USB_StatusTypeDef
 USB_GetCurrentTransaction(USB_CurrentTransTypeDef* trans);
-void USB_CTR(void);
+
+void USB_CTR(USB_CurrentTransTypeDef* tran);
+
+uint32_t USB_CDC_SendData(const uint8_t* pdata, uint32_t len);
 

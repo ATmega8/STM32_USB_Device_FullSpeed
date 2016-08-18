@@ -5,6 +5,7 @@ uint32_t wInterrupt_Mask;
 
 USB_DeviceTypeDef                    usbDevice;
 USB_InformationTypeDef               usbDeviceInfo;
+USB_CurrentTransTypeDef tran;
 
 #define USB_ENABLE_GPIO_CLOCK        RCC_APB2Periph_GPIOA 
 #define USB_ENABLE_GPIO_PORT         GPIOA
