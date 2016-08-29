@@ -26,6 +26,7 @@
 
 #include "usb_regs.h"
 #include "usb_init.h"
+#include "usb_core.h"
 #include "led.h"
 
 #include "FreeRTOS.h"
@@ -131,6 +132,8 @@ void DebugMon_Handler(void)
 /******************************************************************************/
 volatile uint16_t usbInterruptStatus;
 static BaseType_t xHigherPriorityTaskWoken;
+
+USB_CurrentTransTypeDef cTrans;
 
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
