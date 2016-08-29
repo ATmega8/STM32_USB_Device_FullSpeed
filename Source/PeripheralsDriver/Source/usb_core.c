@@ -77,7 +77,7 @@ USB_GetCurrentTransaction(USB_CurrentTransTypeDef* trans)
 		if((epValue & EP_CTR_RX) != 0)
 		{
 			/*清除接收标志*/
-			_ClearEP_CTR_RX(ENDP0);
+			_ClearEP_CTR_RX(trans->ep);
 
 			trans->transaction = USB_Transaction_OUT;
 
@@ -86,7 +86,7 @@ USB_GetCurrentTransaction(USB_CurrentTransTypeDef* trans)
 		else if((epValue & EP_CTR_TX) != 0)
 		{
 			/*清除发送标志*/
-			_ClearEP_CTR_TX(ENDP0);
+			_ClearEP_CTR_TX(trans->ep);
 
 			trans->transaction = USB_Transaction_IN;
 
@@ -133,7 +133,7 @@ void USB_NoDataSetup0(USB_CurrentTransTypeDef* tran)
 		tran->txState = EP_TX_VALID;
 	}
 
-	if(usbDevice.pInformation->USBbRequest == SET_CONFIGURATION)
+	else if(usbDevice.pInformation->USBbRequest == SET_CONFIGURATION)
 	{
 		/*分配地址状态*/
 		usbDevice.state = CONFIGURE;
@@ -141,6 +141,17 @@ void USB_NoDataSetup0(USB_CurrentTransTypeDef* tran)
 		/*返回0字节数据*/
 		SetEPTxCount(ENDP0, 0);
 		tran->txState = EP_TX_VALID;
+	}
+
+	/* Set Line State */
+	else if(usbDevice.pInformation->USBbRequest  == 0x22)
+	{
+			tran->txState = EP_TX_STALL;
+			tran->rxState = EP_RX_VALID;
+
+			SetEPRxCount(ENDP0, 64);
+
+			usbDevice.controlState = USB_ControlState_StatusOut;
 	}
 }
 
@@ -252,8 +263,7 @@ void USB_CDC_SetLineCode(USB_CurrentTransTypeDef* tran)
 
 	SetEPRxCount(ENDP0, 64);
 
-	usbDevice.controlState = USB_ControlState_LastDataOut;
-	usbDevice.state = CONFIGURED;
+	usbDevice.controlState = USB_ControlState_StatusOut;
 }
 
 void USB_DataSetup0(USB_CurrentTransTypeDef* tran)
@@ -267,14 +277,15 @@ void USB_DataSetup0(USB_CurrentTransTypeDef* tran)
 			USB_GetDescriptor(tran);
 		}
 	}
-	/* Set Line Code*/
 	else if((usbDevice.pInformation->USBbmRequestType & 0x21) != 0)
 	{
 
+		/* Set Line Code*/
 		if(usbDevice.pInformation->USBbRequest  == 0x20)
 		{
 			USB_CDC_SetLineCode(tran);
 		}
+
 	}
 }
 
