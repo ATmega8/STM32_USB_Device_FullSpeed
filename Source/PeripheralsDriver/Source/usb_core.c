@@ -291,6 +291,7 @@ void USB_DataSetup0(USB_CurrentTransTypeDef* tran)
 
 void USB_CTR(USB_CurrentTransTypeDef* tran)
 {
+	int16_t txCount;
 
 		if(tran->ep == 0) /*控制端点*/
 		{
@@ -325,6 +326,15 @@ void USB_CTR(USB_CurrentTransTypeDef* tran)
 						SetEPTxCount(ENDP0, 0);
 
 						usbDevice.controlState = USB_ControlState_StatusIn;
+					}
+					else if(usbDevice.controlState == USB_ControlState_StatusOut)
+					{
+						usbDevice.state = CONFIGURED;
+
+						tran->rxState = EP_RX_VALID;
+						tran->txState = EP_TX_STALL;
+
+						SetEPTxCount(ENDP0, 0);
 					}
 
 					_SetEPRxTxStatus(ENDP0, tran->rxState, tran->txState);
