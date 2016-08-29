@@ -97,7 +97,6 @@ int CircularBuffer_Write(CircularBufferTypeDef* pcbuf, void* data, int len)
 	/*检查环形缓冲区状态*/
 	if(CircularBuffer_Status(pcbuf) == CircularBuffer_Full)
 	{
-		printf("%s %d: Circular Buffer Has Full!\n", __FUNCTION__, __LINE__);
 		return -1;
 	}
 
@@ -153,7 +152,6 @@ int CircularBuffer_Read(CircularBufferTypeDef* pcbuf, void* data, int len)
 	/*检查环形缓冲区状态*/
 	if(CircularBuffer_Status(pcbuf) == CircularBuffer_Empty)
 	{
-		printf("%s %d: Circular Buffer Has Empty!\n", __FUNCTION__, __LINE__);
 		return -1;
 	}
 
@@ -183,6 +181,67 @@ int CircularBuffer_Read(CircularBufferTypeDef* pcbuf, void* data, int len)
 
 	/*读出缓冲区开头至写指针方向*/
 	memcpy(data + offset*(CircularBuffer_Size(pcbuf) >> 2), \
+			CircularBuffer_MemoryPointer(pcbuf), \
+			(n - offset)*CircularBuffer_Size(pcbuf));
+
+	/*更新读指针及缓冲区状态*/
+	if((unused  + n) < CircularBuffer_Length(pcbuf))
+	{
+		CircularBuffer_SetTailPosition(pcbuf, \
+				  (CircularBuffer_TailPosition(pcbuf) + n)%CircularBuffer_Length(pcbuf));
+
+		CircularBuffer_SetStatus(pcbuf, CircularBuffer_NoEmpty);	
+	}
+	else 
+	{
+		CircularBuffer_SetTailPosition(pcbuf, CircularBuffer_HeadPosition(pcbuf));
+		CircularBuffer_SetStatus(pcbuf, CircularBuffer_Empty);
+	}
+
+	return n;
+}
+
+int CircularBuffer_WriteToUSB(CircularBufferTypeDef* pcbuf, uint16_t PMA, int len)
+{
+	uint32_t offset, n;
+	int unused;
+	uint16_t* pPMA;
+
+	/*检查环形缓冲区状态*/
+	if(CircularBuffer_Status(pcbuf) == CircularBuffer_Empty)
+	{
+		return -1;
+	}
+
+	/*计算实际读出长度*/
+	if(CircularBuffer_Status(pcbuf) == CircularBuffer_Full)
+	{
+		n = min(len, CircularBuffer_Length(pcbuf));
+		unused = 0;
+	}
+	else
+	{
+		unused = CircularBuffer_Unused(pcbuf);
+	    n = min(len, 
+				(CircularBuffer_Length(pcbuf) - unused));
+
+	}
+
+	/*计算偏移量*/
+	offset = min(n, (CircularBuffer_Length(pcbuf) - CircularBuffer_TailPosition(pcbuf)));
+
+	/*计算PMA地址*/
+	pPMA = (uint16_t*)(PMA*2 + PMA);
+
+	/*读出读指针至缓冲区末尾方向*/
+	memcpy(pPMA, \
+			CircularBuffer_MemoryPointer(pcbuf) + \
+			CircularBuffer_TailPosition(pcbuf)*(CircularBuffer_Size(pcbuf) >> 2), \
+			CircularBuffer_Size(pcbuf)*offset);
+
+
+	/*读出缓冲区开头至写指针方向*/
+	memcpy(pPMA+ offset*(CircularBuffer_Size(pcbuf) >> 2), \
 			CircularBuffer_MemoryPointer(pcbuf), \
 			(n - offset)*CircularBuffer_Size(pcbuf));
 

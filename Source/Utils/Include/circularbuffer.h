@@ -51,3 +51,5 @@ void CircularBuffer_SetLength(CircularBufferTypeDef* pcbuf, int length);
 
 uint32_t CircularBuffer_Unused(CircularBufferTypeDef* pcbuf);
 
+int CircularBuffer_WriteToUSB(CircularBufferTypeDef* pcbuf, uint16_t PMA, int len);
+

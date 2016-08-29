@@ -4,6 +4,7 @@
 #include "usb_desc.h"
 
 #include "led.h"
+#include "main.h"
 
 /*得到当前事务类型*/
 USB_StatusTypeDef
@@ -376,11 +377,15 @@ void USB_CTR(USB_CurrentTransTypeDef* tran)
 			{
 				if(tran->transaction == USB_Transaction_IN)
 				{
-					/*UserToPMABufferCopy(&Virtual_Com_Port_StringProduct[0],
-							GetEPTxAddr(ENDP1), VIRTUAL_COM_PORT_SIZ_STRING_PRODUCT);
+					txCount = CircularBuffer_WriteToUSB(usbTxCbuf, GetEPTxAddr(ENDP1),
+							CircularBuffer_Length(usbTxCbuf) 
+							- CircularBuffer_Unused(usbTxCbuf));
 
-					SetEPTxCount(ENDP1, 1);*/
-				    SetEPTxValid(ENDP1);
+					if(txCount > 0)
+					{
+						SetEPTxCount(ENDP1, txCount);
+						SetEPTxValid(ENDP1);
+					}
 				}
 			}
 		}

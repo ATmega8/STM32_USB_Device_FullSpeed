@@ -34,10 +34,13 @@
 #include <stdio.h>
 
 #include "stm32f10x_conf.h"
+#include "circularbuffer.h"
 
 /* Exported types ------------------------------------------------------------*/
 
 /* Exported constants --------------------------------------------------------*/
+/*发送及接收缓冲区*/
+CircularBufferTypeDef* usbTxCbuf;
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
