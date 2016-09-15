@@ -6,17 +6,28 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
 
-const char str[12] = "He said Hi!\n";
+const uint8_t str[12] = "He said Hi!\n";
 
 void IDLE_Task(void* parameters)
 {
-	uint16_t data = 'a';
+	uint32_t i;
+	uint32_t len = 12;
 
 	while(1)
 	{
 		vTaskDelay(100);
-		CircularBuffer_Write(usbTxCbuf, &data, 1);
+
+		if(usbDevice.state == CONFIGURED)
+		{
+			for(i = 0; i < 12; i++)
+			{
+				usbTxBuffer[i] = str[i];
+			}
+
+			xQueueSend(usbTxBufferCountQueue, &len, 0);
+		}
 	}
 }
 
@@ -29,7 +40,7 @@ int main(void)
 	USB_InterfaceInit();
 
 	/*初始化环形缓冲区*/
-	usbTxCbuf = CircularBuffer_Create(128, sizeof(uint16_t));
+	//usbTxCbuf = CircularBuffer_Create(128, sizeof(uint32_t));
 
 	xTaskCreate(USB_Task, "USB Task", 1024, NULL, 3, NULL);
 	xTaskCreate(IDLE_Task, "Idle Task", 1024, NULL, 1, NULL);

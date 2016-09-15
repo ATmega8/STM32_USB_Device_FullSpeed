@@ -1,4 +1,5 @@
 #include "circularbuffer.h"
+#include "usb_mem.h"
 
 CircularBufferTypeDef* CircularBuffer_Create(int len, size_t size)
 {
@@ -204,7 +205,7 @@ int CircularBuffer_Read(CircularBufferTypeDef* pcbuf, void* data, int len)
 int CircularBuffer_WriteToUSB(CircularBufferTypeDef* pcbuf, uint16_t PMA, int len)
 {
 	uint32_t offset, n;
-	int unused;
+	int unused, i;
 	uint16_t* pPMA;
 
 	/*检查环形缓冲区状态*/
@@ -231,14 +232,21 @@ int CircularBuffer_WriteToUSB(CircularBufferTypeDef* pcbuf, uint16_t PMA, int le
 	offset = min(n, (CircularBuffer_Length(pcbuf) - CircularBuffer_TailPosition(pcbuf)));
 
 	/*计算PMA地址*/
-	pPMA = (uint16_t*)(PMA*2 + PMA);
 
 	/*读出读指针至缓冲区末尾方向*/
-	memcpy(pPMA, \
+	UserToPMABufferCopy(
+			(CircularBuffer_MemoryPointer(pcbuf) + CircularBuffer_TailPosition(pcbuf)), 
+			PMA, offset);
+	/*memcpy(pPMA, \
 			CircularBuffer_MemoryPointer(pcbuf) + \
 			CircularBuffer_TailPosition(pcbuf)*(CircularBuffer_Size(pcbuf) >> 2), \
-			CircularBuffer_Size(pcbuf)*offset);
+			CircularBuffer_Size(pcbuf)*offset);*/
 
+	/*for(i = 0; i < offset; i++)
+	{
+		*(pPMA + i) = 
+			*(CircularBuffer_MemoryPointer(pcbuf) + CircularBuffer_TailPosition(pcbuf) + i);
+	}*/
 
 	/*读出缓冲区开头至写指针方向*/
 	memcpy(pPMA+ offset*(CircularBuffer_Size(pcbuf) >> 2), \
