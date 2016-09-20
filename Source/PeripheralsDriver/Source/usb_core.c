@@ -2,9 +2,12 @@
 #include "usb_init.h"
 #include "usb_mem.h"
 #include "usb_desc.h"
+#include "usb_task.h"
 
 #include "led.h"
 #include "main.h"
+
+uint32_t data = 'a';
 
 /*得到当前事务类型*/
 USB_StatusTypeDef
@@ -291,7 +294,6 @@ void USB_DataSetup0(USB_CurrentTransTypeDef* tran)
 
 void USB_CTR(USB_CurrentTransTypeDef* tran)
 {
-	int16_t txCount;
 
 		if(tran->ep == 0) /*控制端点*/
 		{
@@ -398,16 +400,24 @@ void USB_CTR(USB_CurrentTransTypeDef* tran)
 			{
 				if(tran->transaction == USB_Transaction_IN)
 				{
-					txCount = CircularBuffer_WriteToUSB(usbTxCbuf, GetEPTxAddr(ENDP1),
-							CircularBuffer_Length(usbTxCbuf) 
-							- CircularBuffer_Unused(usbTxCbuf));
-
-					if(txCount > 0)
+					if(tran->txCount != 0)
 					{
-						SetEPTxCount(ENDP1, txCount);
+						UserToPMABufferCopy((uint8_t*)&usbTxBuffer[0], GetEPTxAddr(ENDP1),
+											tran->txCount);
+						SetEPTxCount(ENDP1, tran->txCount);
+						SetEPTxValid(ENDP1);
+						tran->txCount = 0;
+					}
+					else
+					{
+						SetEPTxCount(ENDP1, 0);
 						SetEPTxValid(ENDP1);
 					}
 				}
+			}
+			else if(tran->ep == 3)
+			{
+
 			}
 		}
 }

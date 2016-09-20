@@ -61,7 +61,7 @@ void USB_Reset(void)
 	/* 初始化端点1 */
 	SetEPType(ENDP1, EP_BULK);
 	SetEPTxAddr(ENDP1, ENDP1_TXADDR);
-	SetEPTxStatus(ENDP1, EP_TX_NAK);
+	SetEPTxStatus(ENDP1, EP_TX_VALID);
 	SetEPRxStatus(ENDP1, EP_RX_DIS);
 
 	/* 初始化端点 2 */

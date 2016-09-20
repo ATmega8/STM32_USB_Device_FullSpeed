@@ -147,8 +147,6 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 	if (usbInterruptStatus & ISTR_CTR & IMR_MSK)
 	{
 		USB_GetCurrentTransaction(&tran);
-		USB_CTR(&tran);
-
 		xSemaphoreGiveFromISR(USB_CTR_Semaphore, &xHigherPriorityTaskWoken);
 	}
 	if (usbInterruptStatus & ISTR_RESET & IMR_MSK)

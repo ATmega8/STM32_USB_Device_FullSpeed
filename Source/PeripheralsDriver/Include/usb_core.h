@@ -90,6 +90,8 @@ typedef struct
 	uint32_t ep;
 	uint16_t rxState;
 	uint16_t txState;
+	uint32_t txCount;
+	uint32_t rxCount;
 } USB_CurrentTransTypeDef;
 
 USB_StatusTypeDef
