@@ -23,7 +23,7 @@ void USB_Task(void* parameters)
 	{
 		while(1)
 		{
-			if(xSemaphoreTake(USB_CTR_Semaphore, (TickType_t)1000) == pdTRUE)
+			if(xSemaphoreTake(USB_CTR_Semaphore, portMAX_DELAY) == pdTRUE)
 			{
 				USB_CTR(&tran);
 
